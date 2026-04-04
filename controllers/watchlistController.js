@@ -144,7 +144,7 @@ export const getWatchlist = async (req, res) => {
     }
 
     const [movies] = await db.execute(
-      "SELECT * FROM watchlist WHERE userId=? ORDER BY added_at DESC",
+      "SELECT * FROM watchlist WHERE userId=? ORDER BY created_at DESC",
       [userId],
     );
 
