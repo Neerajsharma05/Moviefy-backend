@@ -17,7 +17,7 @@ export const addToWatchlist = async (req, res) => {
 
     const sql = `
   INSERT INTO watchlist
-  (user_id, movie_id, title, poster_path, vote_average, isWatchList, is_deleted, release_date)
+  (userID, movie_id, title, poster_path, vote_average, isWatchList, is_deleted, release_date)
   VALUES (?,?,?,?,?,?,?,?)
 `;
     await db.execute(sql, [
@@ -83,14 +83,14 @@ export const toggleWatchlist = async (req, res) => {
 
     // 🔍 Check if already exists
     const [existing] = await db.execute(
-      "SELECT * FROM watchlist WHERE user_id=? AND movie_id=?",
+      "SELECT * FROM watchlist WHERE userId=? AND movie_id=?",
       [userId, movie_id]
     );
 
     // ❌ If exists → REMOVE
     if (existing.length > 0) {
       await db.execute(
-        "DELETE FROM watchlist WHERE user_id=? AND movie_id=?",
+        "DELETE FROM watchlist WHERE userID=? AND movie_id=?",
         [userId, movie_id]
       );
 
@@ -103,7 +103,7 @@ export const toggleWatchlist = async (req, res) => {
     // ✅ If not → ADD
     await db.execute(
       `INSERT INTO watchlist 
-      (user_id, movie_id, title, poster_path, vote_average, release_date, isWatchList, is_deleted)
+      (userID, movie_id, title, poster_path, vote_average, release_date, isWatchList, is_deleted)
       VALUES (?,?,?,?,?,?,?,?)`,
       [
         userId,
@@ -144,7 +144,7 @@ export const getWatchlist = async (req, res) => {
     }
 
     const [movies] = await db.execute(
-      "SELECT * FROM watchlist WHERE user_id=? ORDER BY added_at DESC",
+      "SELECT * FROM watchlist WHERE userID=? ORDER BY added_at DESC",
       [userId],
     );
 
@@ -171,7 +171,7 @@ export const removeFromWatchlist = async (req, res) => {
       });
     }
 
-    await db.execute("DELETE FROM watchlist WHERE user_id=? AND movie_id=?", [
+    await db.execute("DELETE FROM watchlist WHERE userID=? AND movie_id=?", [
       userId,
       movieId,
     ]);
