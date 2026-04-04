@@ -4,12 +4,12 @@ import { getDB } from "../config/db.js";
 export const addToWatchlist = async (req, res) => {
       const db = getDB();
   try {
-    const userId = req.user?.id;
+    const userID = req.user?.id;
 
     const { movie_id, title, poster_path, vote_average } = req.body;
 
     // 🔥 VALIDATION (IMPORTANT)
-    if (!userId || !movie_id || !title) {
+    if (!userID || !movie_id || !title) {
       return res.status(400).json({
         message: "Missing required fields",
       });
@@ -21,7 +21,7 @@ export const addToWatchlist = async (req, res) => {
   VALUES (?,?,?,?,?,?,?,?)
 `;
     await db.execute(sql, [
-      userId ?? null,
+      userID ?? null,
       movie_id ?? null,
       title ?? null,
       poster_path ?? null,
@@ -32,7 +32,7 @@ export const addToWatchlist = async (req, res) => {
     ]);
 
     console.log({
-      userId,
+      userID,
       movie_id,
       title,
       poster_path,
@@ -42,7 +42,7 @@ export const addToWatchlist = async (req, res) => {
     res.json({
       message: "Movie added to watchlist",
     });
-    if (!userId || !movie_id || !title?.trim()) {
+    if (!userID || !movie_id || !title?.trim()) {
       return res.status(400).json({
         message: "Missing required fields",
       });
@@ -65,7 +65,7 @@ export const addToWatchlist = async (req, res) => {
 export const toggleWatchlist = async (req, res) => {
       const db = getDB();
   try {
-    const userId = req.user?.id;
+    const userID = req.user?.id;
 
     const {
       movie_id,
@@ -75,7 +75,7 @@ export const toggleWatchlist = async (req, res) => {
       release_date
     } = req.body;
 
-    if (!userId || !movie_id || !title?.trim()) {
+    if (!userID || !movie_id || !title?.trim()) {
       return res.status(400).json({
         message: "Missing required fields"
       });
@@ -83,15 +83,15 @@ export const toggleWatchlist = async (req, res) => {
 
     // 🔍 Check if already exists
     const [existing] = await db.execute(
-      "SELECT * FROM watchlist WHERE userId=? AND movie_id=?",
-      [userId, movie_id]
+      "SELECT * FROM watchlist WHERE userID=? AND movie_id=?",
+      [userID, movie_id]
     );
 
     // ❌ If exists → REMOVE
     if (existing.length > 0) {
       await db.execute(
         "DELETE FROM watchlist WHERE userID=? AND movie_id=?",
-        [userId, movie_id]
+        [userID, movie_id]
       );
 
       return res.json({
@@ -106,7 +106,7 @@ export const toggleWatchlist = async (req, res) => {
       (userID, movie_id, title, poster_path, vote_average, release_date, isWatchList, is_deleted)
       VALUES (?,?,?,?,?,?,?,?)`,
       [
-        userId,
+        userID,
         movie_id,
         title,
         poster_path ?? null,
@@ -135,9 +135,9 @@ export const toggleWatchlist = async (req, res) => {
 export const getWatchlist = async (req, res) => {
       const db = getDB();
   try {
-    const userId = req.user?.id;
+    const userID = req.user?.id;
 
-    if (!userId) {
+    if (!userID) {
       return res.status(401).json({
         message: "Unauthorized",
       });
@@ -145,7 +145,7 @@ export const getWatchlist = async (req, res) => {
 
     const [movies] = await db.execute(
       "SELECT * FROM watchlist WHERE userID=? ORDER BY added_at DESC",
-      [userId],
+      [userID],
     );
 
     res.json(movies);
@@ -162,17 +162,17 @@ export const getWatchlist = async (req, res) => {
 export const removeFromWatchlist = async (req, res) => {
       const db = getDB();
   try {
-    const userId = req.user?.id;
+    const userID = req.user?.id;
     const { movieId } = req.params;
 
-    if (!userId || !movieId) {
+    if (!userID || !movieId) {
       return res.status(400).json({
         message: "Invalid request",
       });
     }
 
     await db.execute("DELETE FROM watchlist WHERE userID=? AND movie_id=?", [
-      userId,
+      userID,
       movieId,
     ]);
 
